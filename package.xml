@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package>
+  <name>carl_safety</name>
+  <version>0.0.0</version>
+  <description>Various safety functionality for remote users of the CARL robot</description>
+
+  <maintainer email="davidkent@wpi.edu">David Kent</maintainer>
+  <author email="davidkent@wpi.edu">David Kent</author>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/carl_safety</url>
+  <url type="bugtracker">https://github.com/WPI-RAIL/carl_safety/issues</url>
+  <url type="repository">https://github.com/WPI-RAIL/carl_safety</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+</package>
