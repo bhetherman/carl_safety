@@ -24,8 +24,6 @@ navSafety::navSafety()
   x = 0.0;
   y = 0.0;
   theta = 0.0;
-  
-  ROS_INFO("CARL safety node started");
 }
 
 void navSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
@@ -65,7 +63,6 @@ void navSafety::cancelNavGoals()
 
 void navSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)
 {
-  ROS_INFO("in pose callback");
   x = msg->position.x;
   y = msg->position.y;
   
@@ -91,8 +88,8 @@ int main(int argc, char **argv)
   {
     if (n.isStopped())
       n.cancelNavGoals();
+    ros::spinOnce();
   }
-  ros::spin();
 
   return EXIT_SUCCESS;
 }
