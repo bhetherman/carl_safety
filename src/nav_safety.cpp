@@ -1,6 +1,7 @@
 #include <carl_safety/nav_safety.h>
 
-navSafety::navSafety()
+navSafety::navSafety() :
+    acMoveBase("/move_base", true)
 {
   // a private handle for this ROS node (allows retrieval of relative parameters)
   ros::NodeHandle private_nh("~");
@@ -48,25 +49,44 @@ void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
 {
   if (!stopped)
   {
-    if (x >= BOUNDARY_X)
-    {
-      if (theta > -PI/2.0 && theta < PI/2.0)
-      {
-        //only publish if going backwards (left)
-        if (msg->linear.x <= 0.0)
-          baseCommandPublisher.publish(*msg);
-      }
-      else
-      {
-        //only publish if going forwards (left)
-        if (msg->linear.x >= 0.0)
-          baseCommandPublisher.publish(*msg);
-      }
-    }
-    else
+    if (x < BOUNDARY_X && y > BOUNDARY_Y)
     {
       //pass command through
       baseCommandPublisher.publish(*msg);
+    }
+    else
+    {
+      if (x >= BOUNDARY_X)
+      {
+        if (theta > -PI/2.0 && theta < PI/2.0)
+        {
+          //only publish if going backwards (left on map)
+          if (msg->linear.x <= 0.0)
+            baseCommandPublisher.publish(*msg);
+        }
+        else
+        {
+          //only publish if going forwards (left on map)
+          if (msg->linear.x >= 0.0)
+            baseCommandPublisher.publish(*msg);
+        }
+      }
+      
+      if (y <= BOUNDARY_Y)
+      {
+        if (theta > 0.0)
+        {
+          //only publish if going forwards (up on map)
+          if (msg->linear.x >= 0.0)
+            baseCommandPublisher.publish(*msg);
+        }
+        else
+        {
+          //only publish if going backwards (up on map)
+          if (msg->linear.x <= 0.0)
+            baseCommandPublisher.publish(*msg);
+        }
+      }
     }
   }
 }
@@ -78,8 +98,7 @@ bool navSafety::isStopped()
 
 void navSafety::cancelNavGoals()
 {
-  //TODO: cancel all goals on the navigation action server
-  
+  acMoveBase.cancelAllGoals();
 }
 
 void navSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)

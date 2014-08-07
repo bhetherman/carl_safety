@@ -14,8 +14,10 @@
 #define NAV_SAFETY_H_
 
 #include <ros/ros.h>
+#include <actionlib/client/simple_action_client.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
+#include <move_base_msgs/MoveBaseAction.h>
 #include <sensor_msgs/Joy.h>
 
 //controller types
@@ -24,6 +26,7 @@
 
 //Boundary
 #define BOUNDARY_X 4.4
+#define BOUNDARY_Y 1.0
 #define PI 3.14159
 
 /*!
@@ -78,6 +81,8 @@ private:
   ros::Subscriber safeBaseCommandSubscriber; /*!< subscriber for base commands coming from the web */
   ros::Subscriber joySubscriber; /*!< subscriber for joystick input */
   ros::Subscriber robotPoseSubscriber; /*!< subscriber for the robot base pose */
+  
+  actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> acMoveBase;
   
   int controllerType;
   bool stopped; /*!< true if safe nav commands should be stopped */
