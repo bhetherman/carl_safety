@@ -22,6 +22,10 @@
 #define ANALOG 0 //analog triggers
 #define DIGITAL 1 //digital triggers
 
+//Boundary
+#define BOUNDARY_X 4.4
+#define PI 3.14159
+
 /*!
  * \class navSafety
  * \brief Prevents CARL from (manually) driving past a linear boundary on the map.

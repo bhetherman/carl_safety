@@ -46,8 +46,29 @@ void navSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 
 void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
-  //TODO: get CARL's localization and prevent commands that drive over a boundary line
-  
+  if (!stopped)
+  {
+    if (x >= BOUNDARY_X)
+    {
+      if (theta > -PI/2.0 && theta < PI/2.0)
+      {
+        //only publish if going backwards (left)
+        if (msg->linear.x <= 0.0)
+          baseCommandPublisher.publish(*msg);
+      }
+      else
+      {
+        //only publish if going forwards (left)
+        if (msg->linear.x >= 0.0)
+          baseCommandPublisher.publish(*msg);
+      }
+    }
+    else
+    {
+      //pass command through
+      baseCommandPublisher.publish(*msg);
+    }
+  }
 }
 
 bool navSafety::isStopped()
@@ -72,8 +93,6 @@ void navSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)
   float q2 = msg->orientation.y;
   float q3 = msg->orientation.z;
   theta = -atan2(2*(q0*q3 + q1*q2), 1 - 2*(q2*q2 + q3*q3));
-  
-  ROS_INFO("theta: %f", theta);
 }
 
 int main(int argc, char **argv)
