@@ -102,7 +102,7 @@ int main(int argc, char **argv)
 
   navSafety n;
 
-  ros::Rate loop_rate(60);
+  ros::Rate loop_rate(30);
   while (ros::ok())
   {
     if (n.isStopped())
