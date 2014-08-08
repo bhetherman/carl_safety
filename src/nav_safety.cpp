@@ -77,13 +77,13 @@ void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
         if (theta > 0.0)
         {
           //only publish if going forwards (up on map)
-          if (msg->linear.x >= 0.0)
+          if (msg->linear.x <= 0.0)
             baseCommandPublisher.publish(*msg);
         }
         else
         {
           //only publish if going backwards (up on map)
-          if (msg->linear.x <= 0.0)
+          if (msg->linear.x >= 0.0)
             baseCommandPublisher.publish(*msg);
         }
       }
