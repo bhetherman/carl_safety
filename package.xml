@@ -2,9 +2,10 @@
 <package>
   <name>carl_safety</name>
   <version>0.0.0</version>
-  <description>Various safety functionality for remote users of the CARL robot</description>
+  <description>Remote User Safety Nodes for CARL</description>
 
   <maintainer email="davidkent@wpi.edu">David Kent</maintainer>
+  <maintainer email="rctoris@wpi.edu">Russell Toris</maintainer>
   <author email="davidkent@wpi.edu">David Kent</author>
 
   <license>BSD</license>
@@ -25,7 +26,5 @@
   <run_depend>actionlib</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>move_base_msgs</run_depend>
-  <run_depend>robot_pose_publisher</run_depend>
   <run_depend>sensor_msgs</run_depend>
-  
 </package>

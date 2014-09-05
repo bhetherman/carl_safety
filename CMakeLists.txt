@@ -27,10 +27,6 @@ include_directories(include
 ## Declare a cpp executable
 add_executable(nav_safety src/nav_safety.cpp)
 
-## Add cmake target dependencies of the executable/library
-## as an example, message headers may need to be generated before nodes
-# add_dependencies(carl_dynamixel_node carl_dynamixel_generate_messages_cpp)
-
 ## Specify libraries to link a library or executable target against
 target_link_libraries(nav_safety
   ${catkin_LIBRARIES}
@@ -49,9 +45,4 @@ install(TARGETS nav_safety
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
   FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
-)
-
-## Copy launch files
-install(DIRECTORY launch/
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 )

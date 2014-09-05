@@ -1,11 +1,11 @@
 #include <carl_safety/nav_safety.h>
 
-navSafety::navSafety() :
+NavSafety::NavSafety() :
     acMoveBase("/move_base", true)
 {
   // a private handle for this ROS node (allows retrieval of relative parameters)
   ros::NodeHandle private_nh("~");
-  
+
   // read in parameters
   std::string str;
   private_nh.param<std::string>("controller_type", str, "digital");
@@ -16,10 +16,10 @@ navSafety::navSafety() :
 
   // ROS topics
   baseCommandPublisher = node.advertise<geometry_msgs::Twist>("cmd_vel", 1);
-  safeBaseCommandSubscriber = node.subscribe("cmd_vel_safe", 1, &navSafety::safeBaseCommandCallback, this);
-  joySubscriber = node.subscribe("joy", 1, &navSafety::joyCallback, this);
-  robotPoseSubscriber = node.subscribe("robot_pose", 1, &navSafety::poseCallback, this);
-  
+  safeBaseCommandSubscriber = node.subscribe("cmd_vel_safe", 1, &NavSafety::safeBaseCommandCallback, this);
+  joySubscriber = node.subscribe("joy", 1, &NavSafety::joyCallback, this);
+  robotPoseSubscriber = node.subscribe("robot_pose", 1, &NavSafety::poseCallback, this);
+
   //initialization
   stopped = false;
   x = 0.0;
@@ -27,7 +27,7 @@ navSafety::navSafety() :
   theta = 0.0;
 }
 
-void navSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
+void NavSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
 {
   if (controllerType == DIGITAL)
   {
@@ -45,7 +45,7 @@ void navSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   }
 }
 
-void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& msg)
+void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& msg)
 {
   if (!stopped)
   {
@@ -58,7 +58,7 @@ void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
     {
       if (x >= BOUNDARY_X)
       {
-        if (theta > -PI/2.0 && theta < PI/2.0)
+        if (theta > -PI / 2.0 && theta < PI / 2.0)
         {
           //only publish if going backwards (left on map)
           if (msg->linear.x <= 0.0)
@@ -71,7 +71,7 @@ void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
             baseCommandPublisher.publish(*msg);
         }
       }
-      
+
       if (y <= BOUNDARY_Y)
       {
         if (theta > 0.0)
@@ -91,27 +91,27 @@ void navSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
   }
 }
 
-bool navSafety::isStopped()
+bool NavSafety::isStopped()
 {
   return stopped;
 }
 
-void navSafety::cancelNavGoals()
+void NavSafety::cancelNavGoals()
 {
   acMoveBase.cancelAllGoals();
 }
 
-void navSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)
+void NavSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)
 {
   x = msg->position.x;
   y = msg->position.y;
-  
+
   //convert quaternion to yaw
   float q0 = msg->orientation.w;
   float q1 = msg->orientation.x;
   float q2 = msg->orientation.y;
   float q3 = msg->orientation.z;
-  theta = -atan2(2*(q0*q3 + q1*q2), 1 - 2*(q2*q2 + q3*q3));
+  theta = -atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
 }
 
 int main(int argc, char **argv)
@@ -119,7 +119,7 @@ int main(int argc, char **argv)
   // initialize ROS and the node
   ros::init(argc, argv, "nav_safety");
 
-  navSafety n;
+  NavSafety n;
 
   ros::Rate loop_rate(30);
   while (ros::ok())
