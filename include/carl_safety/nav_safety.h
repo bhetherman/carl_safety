@@ -15,10 +15,13 @@
 
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
+#include <actionlib/server/simple_action_server.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <move_base_msgs/MoveBaseAction.h>
+#include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Joy.h>
+#include <wpi_jaco_msgs/HomeArmAction.h>
 
 //controller types
 #define ANALOG 0 //analog triggers
@@ -75,20 +78,30 @@ private:
    */
   void poseCallback(const geometry_msgs::Pose::ConstPtr& msg);
 
+  void jacoJointsCallback(const sensor_msgs::JointState::ConstPtr &msg);
+
+  void safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goal);
+
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
   ros::Publisher baseCommandPublisher; /*!< actual base command publisher */
   ros::Subscriber safeBaseCommandSubscriber; /*!< subscriber for base commands coming from the web */
   ros::Subscriber joySubscriber; /*!< subscriber for joystick input */
   ros::Subscriber robotPoseSubscriber; /*!< subscriber for the robot base pose */
+  ros::Subscriber jacoJointsSubscriber;
 
   actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> acMoveBase;
+  actionlib::SimpleActionClient<wpi_jaco_msgs::HomeArmAction> acHome;
+
+  actionlib::SimpleActionServer<move_base_msgs::MoveBaseAction> asSafeMove;
 
   int controllerType;
   bool stopped; /*!< true if safe nav commands should be stopped */
   float x;
   float y;
   float theta;
+  std::vector<float> joints; //jaco arm joint positions
+  std::vector<float> retractPos; //jaco arm retracted joint positions
 };
 
 #endif
