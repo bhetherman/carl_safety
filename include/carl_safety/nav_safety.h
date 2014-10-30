@@ -21,6 +21,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Joy.h>
+#include <wpi_jaco_msgs/GetAngularPosition.h>
 #include <wpi_jaco_msgs/HomeArmAction.h>
 
 //controller types
@@ -49,12 +50,6 @@ public:
   NavSafety();
 
   /**
-   * \brief getter for stopped
-   * @return true if safe nav commands should be stopped
-   */
-  bool isStopped();
-
-  /**
    * \brief cancels all nav goals
    */
   void cancelNavGoals();
@@ -78,8 +73,6 @@ private:
    */
   void poseCallback(const geometry_msgs::Pose::ConstPtr& msg);
 
-  void jacoJointsCallback(const sensor_msgs::JointState::ConstPtr &msg);
-
   void safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goal);
 
   ros::NodeHandle node; /*!< a handle for this ROS node */
@@ -88,7 +81,8 @@ private:
   ros::Subscriber safeBaseCommandSubscriber; /*!< subscriber for base commands coming from the web */
   ros::Subscriber joySubscriber; /*!< subscriber for joystick input */
   ros::Subscriber robotPoseSubscriber; /*!< subscriber for the robot base pose */
-  ros::Subscriber jacoJointsSubscriber;
+
+  ros::ServiceClient jacoPosClient;
 
   actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> acMoveBase;
   actionlib::SimpleActionClient<wpi_jaco_msgs::HomeArmAction> acHome;
@@ -100,7 +94,6 @@ private:
   float x;
   float y;
   float theta;
-  std::vector<float> joints; //jaco arm joint positions
   std::vector<float> retractPos; //jaco arm retracted joint positions
 };
 

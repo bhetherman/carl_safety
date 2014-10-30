@@ -4,7 +4,7 @@ project(carl_safety)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp actionlib geometry_msgs move_base_msgs sensor_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp actionlib geometry_msgs move_base_msgs sensor_msgs wpi_jaco_msgs)
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -31,6 +31,8 @@ add_executable(nav_safety src/nav_safety.cpp)
 target_link_libraries(nav_safety
   ${catkin_LIBRARIES}
 )
+
+add_dependencies(nav_safety wpi_jaco_msgs_gencpp)
 
 #############
 ## Install ##

@@ -21,14 +21,15 @@ NavSafety::NavSafety() :
   safeBaseCommandSubscriber = node.subscribe("cmd_vel_safe", 1, &NavSafety::safeBaseCommandCallback, this);
   joySubscriber = node.subscribe("joy", 1, &NavSafety::joyCallback, this);
   robotPoseSubscriber = node.subscribe("robot_pose", 1, &NavSafety::poseCallback, this);
-  jacoJointsSubscriber = node.subscribe("jaco_arm/joint_states", 1, &NavSafety::jacoJointsCallback, this);
+
+  // ROS services
+  jacoPosClient = node.serviceClient<wpi_jaco_msgs::GetAngularPosition>("jaco_arm/get_angular_position");
 
   //initialization
   stopped = false;
   x = 0.0;
   y = 0.0;
   theta = 0.0;
-  joints.resize(6);
   retractPos.resize(6);
   retractPos[0] = -2.57;
   retractPos[1] = 1.39;
@@ -45,14 +46,20 @@ void NavSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   if (controllerType == DIGITAL)
   {
     if (joy->buttons.at(8) == 1)
+    {
       stopped = true;
+      cancelNavGoals();
+    }
     else if (joy->buttons.at(9) == 1)
       stopped = false;
   }
   else
   {
     if (joy->buttons.at(6) == 1)
+    {
       stopped = true;
+      cancelNavGoals();
+    }
     else if (joy->buttons.at(7) == 1)
       stopped = false;
   }
@@ -104,14 +111,11 @@ void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
   }
 }
 
-bool NavSafety::isStopped()
-{
-  return stopped;
-}
-
 void NavSafety::cancelNavGoals()
 {
   acMoveBase.cancelAllGoals();
+  move_base_msgs::MoveBaseResult moveResult;
+  asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
 }
 
 void NavSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)
@@ -127,42 +131,54 @@ void NavSafety::poseCallback(const geometry_msgs::Pose::ConstPtr& msg)
   theta = -atan2(2 * (q0 * q3 + q1 * q2), 1 - 2 * (q2 * q2 + q3 * q3));
 }
 
-void NavSafety::jacoJointsCallback(const sensor_msgs::JointState::ConstPtr &msg)
-{
-  for (unsigned int i = 0; i < 6; i ++)
-  {
-    joints[i] = msg->position[i];
-  }
-}
-
 void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goal)
 {
-  float dstFromRetract = 0;
-  for (unsigned int i = 0; i < 6; i ++)
+  if (!stopped)
   {
-    dstFromRetract += fabs(retractPos[i] - joints[i]);
+    float dstFromRetract = 0;
+
+    //get joint positions
+    wpi_jaco_msgs::GetAngularPosition::Request req;
+    wpi_jaco_msgs::GetAngularPosition::Response res;
+    if(!jacoPosClient.call(req, res))
+    {
+      ROS_INFO("Could not call Jaco joint position service.");
+      move_base_msgs::MoveBaseResult moveResult;
+      asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
+      return;
+    }
+
+    for (unsigned int i = 0; i < 6; i ++)
+    {
+      dstFromRetract += fabs(retractPos[i] - res.pos[i]);
+    }
+    ROS_INFO("Distance from retract position: %f", dstFromRetract);
+    if (dstFromRetract > 0.175)
+    {
+      ROS_INFO("Retracting arm for safe navigation...");
+      wpi_jaco_msgs::HomeArmGoal retractGoal;
+      retractGoal.retract = true;
+      retractGoal.retractPosition.position = true;
+      retractGoal.retractPosition.armCommand = true;
+      retractGoal.retractPosition.fingerCommand = false;
+      retractGoal.retractPosition.repeat = false;
+      retractGoal.retractPosition.joints.resize(6);
+      retractGoal.retractPosition.joints = retractPos;
+      acHome.sendGoal(retractGoal);
+      acHome.waitForResult(ros::Duration(15.0));
+      ros::Duration(3.0).sleep();
+    }
+    ROS_INFO("Sending nav goal to move_base action server.");
+    acMoveBase.sendGoal(*goal);
+    acMoveBase.waitForResult();
+    asSafeMove.setSucceeded(*acMoveBase.getResult());
+    ROS_INFO("Finished");
   }
-  ROS_INFO("Distance from retract position: %f", dstFromRetract);
-  if (dstFromRetract > 0.175)
+  else
   {
-    ROS_INFO("Retracting arm for safe navigation...");
-    wpi_jaco_msgs::HomeArmGoal retractGoal;
-    retractGoal.retract = true;
-    retractGoal.retractPosition.position = true;
-    retractGoal.retractPosition.armCommand = true;
-    retractGoal.retractPosition.fingerCommand = false;
-    retractGoal.retractPosition.repeat = false;
-    retractGoal.retractPosition.joints.resize(6);
-    retractGoal.retractPosition.joints = retractPos;
-    acHome.sendGoal(retractGoal);
-    acHome.waitForResult(ros::Duration(15.0));
-    ros::Duration(3.0).sleep();
+    move_base_msgs::MoveBaseResult moveResult;
+    asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
   }
-  ROS_INFO("Sending nav goal to move_base action server.");
-  acMoveBase.sendGoal(*goal);
-  acMoveBase.waitForResult();
-  asSafeMove.setSucceeded(*acMoveBase.getResult());
-  ROS_INFO("Finished");
 }
 
 int main(int argc, char **argv)
@@ -172,13 +188,7 @@ int main(int argc, char **argv)
 
   NavSafety n;
 
-  ros::Rate loop_rate(30);
-  while (ros::ok())
-  {
-    if (n.isStopped())
-      n.cancelNavGoals();
-    ros::spinOnce();
-  }
+  ros::spin();
 
   return EXIT_SUCCESS;
 }
