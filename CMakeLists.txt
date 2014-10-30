@@ -4,7 +4,7 @@ project(carl_safety)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp actionlib geometry_msgs move_base_msgs sensor_msgs wpi_jaco_msgs)
+find_package(catkin REQUIRED COMPONENTS roscpp actionlib geometry_msgs move_base_msgs nav_msgs sensor_msgs std_msgs tf wpi_jaco_msgs)
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -26,11 +26,13 @@ include_directories(include
 
 ## Declare a cpp executable
 add_executable(nav_safety src/nav_safety.cpp)
+add_executable(teleop_safety src/teleop_safety.cpp)
+add_executable(arm_safety src/arm_safety.cpp)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(nav_safety
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(nav_safety ${catkin_LIBRARIES})
+target_link_libraries(teleop_safety ${catkin_LIBRARIES})
+target_link_libraries(arm_safety ${catkin_LIBRARIES})
 
 add_dependencies(nav_safety wpi_jaco_msgs_gencpp)
 
@@ -39,7 +41,7 @@ add_dependencies(nav_safety wpi_jaco_msgs_gencpp)
 #############
 
 ## Mark executables and/or libraries for installation
-install(TARGETS nav_safety
+install(TARGETS nav_safety teleop_safety arm_safety
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
