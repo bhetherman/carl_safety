@@ -34,5 +34,5 @@
   <run_depend>wpi_jaco_msgs</run_depend>
   <run_depend>std_msgs</run_depend>
   <run_depend>nav_msgs</run_depend>
-  <run_depend>tf_msgs</run_depend>
+  <run_depend>tf</run_depend>
 </package>
