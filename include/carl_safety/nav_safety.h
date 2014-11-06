@@ -96,7 +96,7 @@ private:
   float theta;
   std::vector<float> retractPos; //jaco arm retracted joint positions
 
-  int use_teleop_safety; /*!< launch param to determine which node to publish to */
+  bool use_teleop_safety; /*!< launch param to determine which node to publish to */
 };
 
 #endif

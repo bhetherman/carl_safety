@@ -67,7 +67,9 @@ private:
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
   ros::Subscriber joint_sub; /*!< the JointState topic */
-  int make_noise; /*!< launch param to determine if this node should make noise */
+
+  bool enable_audible_warnings; /*!< launch param to determine if this node should produce audible warnings when the
+   arm exceeds a safety threshold*/
 };
 
 /*!

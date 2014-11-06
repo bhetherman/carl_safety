@@ -67,6 +67,10 @@ public:
    */
   teleop_safety();
 
+  /**
+  * \brief Destructor
+  */
+  ~teleop_safety();
 
 private:
   /*!
@@ -92,13 +96,13 @@ private:
 
 
 
-  void cmd_vel_cback(const geometry_msgs::Twist::ConstPtr& cmd);
+  void cmd_vel_safety_check_cback(const geometry_msgs::Twist::ConstPtr& cmd);
 
   ros::NodeHandle node; /*!< a handle for this ROS node */
   tf::TransformListener* pListener;
 
-  ros::Publisher safe_cmd_vel; /*!< the base safe_cmd_vel topic */
-  ros::Subscriber cmd_vel; /*!< the base cmd_vel topic */
+  ros::Publisher cmd_vel_pub; /*!< cmd_vel publisher for the base */
+  ros::Subscriber cmd_vel_safety_check; /*!< subscriber to the cmd_vel topic that should be checked for safety */
   ros::Subscriber scan_sub; /*!< the scan topic */
   ros::Subscriber map_sub; /*!< the map topic */
   ros::Subscriber amcl_pose_sub; /*!< the amcl_pose topic */

@@ -1,21 +1,18 @@
 <!--
    Author: David Kent, Worcester Polytechnic Institute
-   Author: Steven Kordell, Worcester Polytechnic Institute
-   Author: Russell Toris, Worcester Polytechnic Institute
    Author: Brian Hetherman, Worcester Polytechnic Institute
   Version: July 24, 2014
 -->
 
 <launch>
-  <arg name="use_teleop_safety" value="0" />
-  <arg name="make_noise" value="1" />
+  <arg name="use_teleop_safety" default="false" />
+  <arg name="enable_audible_warnings" default="false" />
 
   <node pkg="carl_safety" type="nav_safety" name="nav_safety" output="screen">
     <param name="use_teleop_safety" type="int" value="$(arg use_teleop_safety)" />
   </node>
   <node pkg="carl_safety" type="arm_safety" name="arm_safety" output="screen">
-    <param name="make_noise" type="int" value="$(arg make_noise)" />
+    <param name="enable_audible_warnings" type="bool" value="$(arg enable_audible_warnings)" />
   </node>
-  <node pkg="carl_safety" type="teleop_safety" name="teleop_safety" output="screen">
-  </node>
+  <node pkg="carl_safety" type="teleop_safety" name="teleop_safety" output="screen" />
 </launch>
