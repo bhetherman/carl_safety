@@ -67,6 +67,7 @@ private:
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
   ros::Subscriber joint_sub; /*!< the JointState topic */
+  int make_noise; /*!< launch param to determine if this node should make noise */
 };
 
 /*!

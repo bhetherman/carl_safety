@@ -6,6 +6,7 @@ arm_safety::arm_safety()
 {
   // a private handle for this ROS node (allows retrieval of relative parameters)
   ros::NodeHandle private_nh("~");
+  private_nh.param<int>("make_noise", make_noise, 1);
 
   // create the ROS topics
   joint_sub = node.subscribe<sensor_msgs::JointState>("/jaco_arm/joint_states", 10, &arm_safety::joints_cback, this);
@@ -54,7 +55,7 @@ void arm_safety::joints_cback(const sensor_msgs::JointState::ConstPtr& joints)
     shouldSpeak = 1;
   }
 
-  if(shouldSpeak == 1) system("espeak \"ouch\"");
+  if(shouldSpeak && make_noise) system("espeak \"ouch\"");
 }
 
 int main(int argc, char **argv)

@@ -7,6 +7,7 @@ NavSafety::NavSafety() :
 {
   // a private handle for this ROS node (allows retrieval of relative parameters)
   ros::NodeHandle private_nh("~");
+  private_nh.param<int>("use_teleop_safety", use_teleop_safety, 0);
 
   // read in parameters
   std::string str;
@@ -17,7 +18,12 @@ NavSafety::NavSafety() :
     controllerType = ANALOG;
 
   // ROS topics
-  baseCommandPublisher = node.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+
+  if(use_teleop_safety)
+    baseCommandPublisher = node.advertise<geometry_msgs::Twist>("not_checked_cmd_vel", 1);
+  else
+    baseCommandPublisher = node.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+
   safeBaseCommandSubscriber = node.subscribe("cmd_vel_safe", 1, &NavSafety::safeBaseCommandCallback, this);
   joySubscriber = node.subscribe("joy", 1, &NavSafety::joyCallback, this);
   robotPoseSubscriber = node.subscribe("robot_pose", 1, &NavSafety::poseCallback, this);
