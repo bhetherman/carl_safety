@@ -8,8 +8,8 @@ teleop_safety::teleop_safety()
   ros::NodeHandle private_nh("~");
 
   // create the ROS topics
-  safe_cmd_vel = node.advertise<geometry_msgs::Twist>("safe_cmd_vel", 10);
-  cmd_vel = node.subscribe<geometry_msgs::Twist>("/cmd_vel", 10, &teleop_safety::cmd_vel_cback, this);
+  safe_cmd_vel = node.advertise<geometry_msgs::Twist>("cmd_vel", 10);
+  cmd_vel = node.subscribe<geometry_msgs::Twist>("/not_checked_cmd_vel", 10, &teleop_safety::cmd_vel_cback, this);
   scan_sub = node.subscribe<sensor_msgs::LaserScan>("/scan", 10, &teleop_safety::scan_cback, this);
   map_sub = node.subscribe<nav_msgs::OccupancyGrid>("/map", 10, &teleop_safety::map_cback, this);
   amcl_pose_sub = node.subscribe<geometry_msgs::PoseWithCovarianceStamped>("/amcl_pose", 10, &teleop_safety::amcl_pose_cback, this);
@@ -26,12 +26,11 @@ void teleop_safety::cmd_vel_cback(const geometry_msgs::Twist::ConstPtr& cmd)
   twist = *cmd;
   if(twist.linear.x > 0){
     twist.linear.x *= forward_throttle_safety_factor_base;
-    safe_cmd_vel.publish(cmd);
   }
   else if(twist.linear.x < 0){
     twist.linear.x *= reverse_throttle_safety_factor_base;
-    safe_cmd_vel.publish(twist);
   }
+  safe_cmd_vel.publish(twist);
 }
 
 void teleop_safety::scan_cback(const sensor_msgs::LaserScan::ConstPtr& ptr)
@@ -97,7 +96,7 @@ void teleop_safety::scan_cback(const sensor_msgs::LaserScan::ConstPtr& ptr)
     forward_throttle_safety_factor_base = 1.0;
   else{
     forward_throttle_safety_factor_base = (closestDist-MIN_FORWARD_SAFE_DIST)/(START_FORWARD_SAFETY_THROTTLE_DIST-MIN_FORWARD_SAFE_DIST);
-    if(forward_throttle_safety_factor_base < 0.05) forward_throttle_safety_factor_base = 0.05;
+    if(forward_throttle_safety_factor_base < 0.1) forward_throttle_safety_factor_base = 0.1;
   }
   
 }
@@ -149,7 +148,7 @@ void teleop_safety::amcl_pose_cback(const geometry_msgs::PoseWithCovarianceStamp
           //in relation to the distance of the point
           else if(closestDist <= startTrottleDistMap){
             reverse_throttle_safety_factor_base = (closestDist-minSafeDistMap)/(startTrottleDistMap-minSafeDistMap);
-            if(reverse_throttle_safety_factor_base < 0.05) reverse_throttle_safety_factor_base = 0.05;
+            if(reverse_throttle_safety_factor_base < 0.1) reverse_throttle_safety_factor_base = 0.1;
           }
         } 
 
