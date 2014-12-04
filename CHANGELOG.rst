@@ -2,6 +2,20 @@
 Changelog for package carl_safety
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.2 (2014-12-04)
+------------------
+* Changed int param to bool
+* Parameter, topic, and launch file cleanup for consistency
+* Merge pull request `#2 <https://github.com/WPI-RAIL/carl_safety/issues/2>`_ from bhetherman/develop
+  changes to make teleop safety and arm noise able to toggle on and off with launch paramater
+* changes to make teleop safety and arm noise able to toggle on and off with launch paramater
+* Update .travis.yml
+* Update package.xml
+* merged
+* Added dependency on wpi_jaco_msgs for safe nav
+* Implemented /move_base_safe to retract the arm before navigation
+* Contributors: Brian Hetherman, David Kent, Russell Toris
+
 0.0.1 (2014-09-05)
 ------------------
 * cleanup for release
