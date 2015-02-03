@@ -75,6 +75,8 @@ private:
 
   void safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goal);
 
+  bool isArmRetracted();
+
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
   ros::Publisher baseCommandPublisher; /*!< actual base command publisher */

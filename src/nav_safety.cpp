@@ -18,7 +18,6 @@ NavSafety::NavSafety() :
     controllerType = ANALOG;
 
   // ROS topics
-
   if(use_teleop_safety)
     baseCommandPublisher = node.advertise<geometry_msgs::Twist>("cmd_vel_safety_check", 1);
   else
@@ -75,6 +74,11 @@ void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
 {
   if (!stopped)
   {
+    if (!isArmRetracted())
+    {
+      ROS_INFO("Overriding manual navigation because arm is not retracted.");
+      return;
+    }
     if (x < BOUNDARY_X && y > BOUNDARY_Y)
     {
       //pass command through
@@ -141,25 +145,7 @@ void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goa
 {
   if (!stopped)
   {
-    float dstFromRetract = 0;
-
-    //get joint positions
-    wpi_jaco_msgs::GetAngularPosition::Request req;
-    wpi_jaco_msgs::GetAngularPosition::Response res;
-    if(!jacoPosClient.call(req, res))
-    {
-      ROS_INFO("Could not call Jaco joint position service.");
-      move_base_msgs::MoveBaseResult moveResult;
-      asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
-      return;
-    }
-
-    for (unsigned int i = 0; i < 6; i ++)
-    {
-      dstFromRetract += fabs(retractPos[i] - res.pos[i]);
-    }
-    ROS_INFO("Distance from retract position: %f", dstFromRetract);
-    if (dstFromRetract > 0.175)
+    if (!isArmRetracted())
     {
       ROS_INFO("Retracting arm for safe navigation...");
       wpi_jaco_msgs::HomeArmGoal retractGoal;
@@ -185,6 +171,31 @@ void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goa
     move_base_msgs::MoveBaseResult moveResult;
     asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
   }
+}
+
+bool NavSafety::isArmRetracted()
+{
+  float dstFromRetract = 0;
+
+  //get joint positions
+  wpi_jaco_msgs::GetAngularPosition::Request req;
+  wpi_jaco_msgs::GetAngularPosition::Response res;
+  if(!jacoPosClient.call(req, res))
+  {
+    ROS_INFO("Could not call Jaco joint position service.");
+    move_base_msgs::MoveBaseResult moveResult;
+    asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
+    return false;
+  }
+
+  for (unsigned int i = 0; i < 6; i ++)
+  {
+    dstFromRetract += fabs(retractPos[i] - res.pos[i]);
+  }
+
+  if (dstFromRetract > 0.175)
+    return false;
+  return true;
 }
 
 int main(int argc, char **argv)
