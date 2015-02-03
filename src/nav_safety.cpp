@@ -76,7 +76,7 @@ void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
   {
     if (!isArmRetracted())
     {
-      ROS_INFO("Overriding manual navigation because arm is not retracted.");
+      //ignore movement command if arm is in a dangerous position
       return;
     }
     if (x < BOUNDARY_X && y > BOUNDARY_Y)
@@ -164,7 +164,7 @@ void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goa
     acMoveBase.sendGoal(*goal);
     acMoveBase.waitForResult();
     asSafeMove.setSucceeded(*acMoveBase.getResult());
-    ROS_INFO("Finished");
+    ROS_INFO("Navigation finished");
   }
   else
   {
