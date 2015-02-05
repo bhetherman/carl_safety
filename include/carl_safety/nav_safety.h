@@ -22,6 +22,7 @@
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Joy.h>
 #include <wpi_jaco_msgs/GetAngularPosition.h>
+#include <wpi_jaco_msgs/GetCartesianPosition.h>
 #include <wpi_jaco_msgs/HomeArmAction.h>
 
 //controller types
@@ -77,6 +78,8 @@ private:
 
   bool isArmRetracted();
 
+  bool isArmContained();
+
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
   ros::Publisher baseCommandPublisher; /*!< actual base command publisher */
@@ -85,6 +88,7 @@ private:
   ros::Subscriber robotPoseSubscriber; /*!< subscriber for the robot base pose */
 
   ros::ServiceClient jacoPosClient;
+  ros::ServiceClient jacoCartesianClient;
 
   actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> acMoveBase;
   actionlib::SimpleActionClient<wpi_jaco_msgs::HomeArmAction> acHome;

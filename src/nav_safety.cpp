@@ -29,6 +29,7 @@ NavSafety::NavSafety() :
 
   // ROS services
   jacoPosClient = node.serviceClient<wpi_jaco_msgs::GetAngularPosition>("jaco_arm/get_angular_position");
+  jacoCartesianClient = node.serviceClient<wpi_jaco_msgs::GetCartesianPosition>("jaco_arm/get_cartesian_position");
 
   //initialization
   stopped = false;
@@ -74,9 +75,10 @@ void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
 {
   if (!stopped)
   {
-    if (!isArmRetracted())
+    if (!isArmContained())
     {
       //ignore movement command if arm is in a dangerous position
+      ROS_INFO("Navigation command ignored because arm is not contained.");
       return;
     }
     if (x < BOUNDARY_X && y > BOUNDARY_Y)
@@ -145,31 +147,24 @@ void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goa
 {
   if (!stopped)
   {
-    if (!isArmRetracted())
+    if (isArmContained())
     {
-      ROS_INFO("Retracting arm for safe navigation...");
-      wpi_jaco_msgs::HomeArmGoal retractGoal;
-      retractGoal.retract = true;
-      retractGoal.retractPosition.position = true;
-      retractGoal.retractPosition.armCommand = true;
-      retractGoal.retractPosition.fingerCommand = false;
-      retractGoal.retractPosition.repeat = false;
-      retractGoal.retractPosition.joints.resize(6);
-      retractGoal.retractPosition.joints = retractPos;
-      acHome.sendGoal(retractGoal);
-      acHome.waitForResult(ros::Duration(15.0));
-      ros::Duration(3.0).sleep();
+      ROS_INFO("Sending nav goal to move_base action server.");
+      acMoveBase.sendGoal(*goal);
+      acMoveBase.waitForResult();
+      asSafeMove.setSucceeded(*acMoveBase.getResult());
+      ROS_INFO("Navigation finished");
     }
-    ROS_INFO("Sending nav goal to move_base action server.");
-    acMoveBase.sendGoal(*goal);
-    acMoveBase.waitForResult();
-    asSafeMove.setSucceeded(*acMoveBase.getResult());
-    ROS_INFO("Navigation finished");
+    else
+    {
+      move_base_msgs::MoveBaseResult moveResult;
+      asSafeMove.setAborted(moveResult, "Navigation aborted because the arm is not contained within the robot's navigation footprint.");
+    }
   }
   else
   {
     move_base_msgs::MoveBaseResult moveResult;
-    asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
+    asSafeMove.setAborted(moveResult, "Navigation aborted due to manual safety override.");
   }
 }
 
@@ -183,8 +178,6 @@ bool NavSafety::isArmRetracted()
   if(!jacoPosClient.call(req, res))
   {
     ROS_INFO("Could not call Jaco joint position service.");
-    move_base_msgs::MoveBaseResult moveResult;
-    asSafeMove.setAborted(moveResult, "Navigation aborted for safety reasons.");
     return false;
   }
 
@@ -196,6 +189,18 @@ bool NavSafety::isArmRetracted()
   if (dstFromRetract > 0.175)
     return false;
   return true;
+}
+
+bool NavSafety::isArmContained()
+{
+  wpi_jaco_msgs::GetCartesianPosition srv;
+  if (!jacoCartesianClient.call(srv))
+  {
+    ROS_INFO("Could not call Jaco Cartesian position service.");
+    return false;
+  }
+
+  return (srv.response.pos.linear.x <= .215 && srv.response.pos.linear.x >= -.435 && fabs(srv.response.pos.linear.y) <= .24);
 }
 
 int main(int argc, char **argv)
