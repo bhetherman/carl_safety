@@ -21,6 +21,7 @@
 #include <move_base_msgs/MoveBaseAction.h>
 #include <sensor_msgs/JointState.h>
 #include <sensor_msgs/Joy.h>
+#include <std_srvs/Empty.h>
 #include <wpi_jaco_msgs/GetAngularPosition.h>
 #include <wpi_jaco_msgs/GetCartesianPosition.h>
 #include <wpi_jaco_msgs/HomeArmAction.h>
@@ -74,7 +75,23 @@ private:
    */
   void poseCallback(const geometry_msgs::Pose::ConstPtr& msg);
 
+  /**
+  * \brief Layer for safely controlling base movement commands
+  *
+  * This node will prevent the robot from moving while the arm is extended beyond the navigation footprint of the base;
+  * input to this node can also be cut off independently from stopping lower level control, so that external base move
+  * commands can be suspended
+  */
   void safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goal);
+
+  /**
+  * \brief Callback for stopping manual and autonomous navigation from the safe base movement layer
+  *
+  * @param req empty service request
+  * @param res empty service response
+  * @return true on success
+  */
+  bool navStopCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res);
 
   bool isArmRetracted();
 
@@ -89,6 +106,7 @@ private:
 
   ros::ServiceClient jacoPosClient;
   ros::ServiceClient jacoCartesianClient;
+  ros::ServiceServer stopBaseNavServer;
 
   actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> acMoveBase;
   actionlib::SimpleActionClient<wpi_jaco_msgs::HomeArmAction> acHome;

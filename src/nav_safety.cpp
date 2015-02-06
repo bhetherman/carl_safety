@@ -30,6 +30,7 @@ NavSafety::NavSafety() :
   // ROS services
   jacoPosClient = node.serviceClient<wpi_jaco_msgs::GetAngularPosition>("jaco_arm/get_angular_position");
   jacoCartesianClient = node.serviceClient<wpi_jaco_msgs::GetCartesianPosition>("jaco_arm/get_cartesian_position");
+  stopBaseNavServer = node.advertiseService("carl_safety/stop_base_nav", &NavSafety::navStopCallback, this);
 
   //initialization
   stopped = false;
@@ -168,6 +169,14 @@ void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goa
   }
 }
 
+bool NavSafety::navStopCallback(std_srvs::Empty::Request &req, std_srvs::Empty::Response &res)
+{
+  stopped = true;
+  cancelNavGoals();
+
+  return true;
+}
+
 bool NavSafety::isArmRetracted()
 {
   float dstFromRetract = 0;
@@ -200,7 +209,9 @@ bool NavSafety::isArmContained()
     return false;
   }
 
-  return (srv.response.pos.linear.x <= .215 && srv.response.pos.linear.x >= -.435 && fabs(srv.response.pos.linear.y) <= .24);
+  return (srv.response.pos.linear.x <= .215 && srv.response.pos.linear.x >= -.435
+            && fabs(srv.response.pos.linear.y) <= .28
+            && srv.response.pos.linear.z >= .19);
 }
 
 int main(int argc, char **argv)
