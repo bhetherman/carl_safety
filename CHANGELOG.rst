@@ -2,8 +2,8 @@
 Changelog for package carl_safety
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.0.3 (2015-02-06)
+------------------
 * message generation dependency
 * Split launch file into basic safety nodes that should always be on and nodes that only affect safety when using an external interface
 * launch file for tipping safety
