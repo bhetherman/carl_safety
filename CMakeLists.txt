@@ -37,6 +37,7 @@ target_link_libraries(arm_safety ${catkin_LIBRARIES})
 target_link_libraries(tipping_safety ${catkin_LIBRARIES})
 
 add_dependencies(nav_safety wpi_jaco_msgs_gencpp)
+add_dependencies(tipping_safety wpi_jaco_msgs_gencpp)
 
 #############
 ## Install ##
