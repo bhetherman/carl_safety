@@ -79,7 +79,6 @@ void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
     if (!isArmContained())
     {
       //ignore movement command if arm is in a dangerous position
-      ROS_INFO("Navigation command ignored because arm is not contained.");
       return;
     }
     if (x < BOUNDARY_X && y > BOUNDARY_Y)
