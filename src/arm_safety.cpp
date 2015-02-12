@@ -41,15 +41,15 @@ void arm_safety::joints_cback(const sensor_msgs::JointState::ConstPtr& joints)
     shouldSpeak = true;
   }
   if(abs(joints->effort[6])>F1_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", F1_THRESHOLD, joints->effort[6]);
+    ROS_ERROR("Torque on jaco_finger_joint_1 outside threshold (+/-%f Nm) with value %f", F1_THRESHOLD, joints->effort[6]);
     shouldSpeak = true;
   }
   if(abs(joints->effort[7])>F2_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", F2_THRESHOLD, joints->effort[7]);
+    ROS_ERROR("Torque on jaco_finger_joint_2 outside threshold (+/-%f Nm) with value %f", F2_THRESHOLD, joints->effort[7]);
     shouldSpeak = true;
   }
   if(abs(joints->effort[8])>F3_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", F3_THRESHOLD, joints->effort[8]);
+    ROS_ERROR("Torque on jaco_finger_joint_3 outside threshold (+/-%f Nm) with value %f", F3_THRESHOLD, joints->effort[8]);
     shouldSpeak = true;
   }
 
