@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>carl_safety</name>
-  <version>0.0.3</version>
+  <version>0.0.4</version>
   <description>Remote User Safety Nodes for CARL</description>
 
   <maintainer email="davidkent@wpi.edu">David Kent</maintainer>
