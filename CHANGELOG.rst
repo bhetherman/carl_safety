@@ -2,6 +2,15 @@
 Changelog for package carl_safety
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.4 (2015-02-17)
+------------------
+* Adjusted finger current thresholds
+* Fixed output message for finger joints on arm safety
+* Adjustments for finger safety threshold
+* Merge branch 'develop' of https://github.com/WPI-RAIL/carl_safety into develop
+* Arm safety threshold tuning
+* Contributors: David Kent
+
 0.0.3 (2015-02-06)
 ------------------
 * message generation dependency
