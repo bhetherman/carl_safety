@@ -1,0 +1,16 @@
+<!--
+   Author: David Kent, Worcester Polytechnic Institute
+   Author: Brian Hetherman, Worcester Polytechnic Institute
+  Version: July 24, 2014
+-->
+
+<launch>
+  <arg name="enable_audible_warnings" default="true" />
+
+  <node pkg="carl_safety" type="arm_safety" name="arm_safety" output="screen">
+    <param name="enable_audible_warnings" type="bool" value="$(arg enable_audible_warnings)" />
+  </node>
+  <node pkg="carl_safety" type="tipping_safety" name="tipping_safety" output="screen">
+    <param name="enable_audible_warnings" type="bool" value="$(arg enable_audible_warnings)" />
+  </node>
+</launch>

@@ -12,46 +12,44 @@ arm_safety::arm_safety()
   joint_sub = node.subscribe<sensor_msgs::JointState>("/jaco_arm/joint_states", 10, &arm_safety::joints_cback, this);
 }
 
-
-
 void arm_safety::joints_cback(const sensor_msgs::JointState::ConstPtr& joints)
 {
   bool shouldSpeak = false;
 
-  if(abs(joints->effort[0])>LARGE_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_1 outside threshold (+/-%f Nm) with value %f", LARGE_ACTUATOR_THRESHOLD, joints->effort[0]);
+  if(abs(joints->effort[0])>J1_THRESHOLD){
+    ROS_ERROR("Torque on jaco_joint_1 outside threshold (+/-%f Nm) with value %f", J1_THRESHOLD, joints->effort[0]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[1])>LARGE_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_2 outside threshold (+/-%f Nm) with value %f", LARGE_ACTUATOR_THRESHOLD, joints->effort[1]);
+  if(abs(joints->effort[1])>J2_THRESHOLD){
+    ROS_ERROR("Torque on jaco_joint_2 outside threshold (+/-%f Nm) with value %f", J2_THRESHOLD, joints->effort[1]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[2])>LARGE_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_3 outside threshold (+/-%f Nm) with value %f", LARGE_ACTUATOR_THRESHOLD, joints->effort[2]);
+  if(abs(joints->effort[2])>J3_THRESHOLD){
+    ROS_ERROR("Torque on jaco_joint_3 outside threshold (+/-%f Nm) with value %f", J3_THRESHOLD, joints->effort[2]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[3])>SMALL_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_4 outside threshold (+/-%f Nm) with value %f", SMALL_ACTUATOR_THRESHOLD, joints->effort[3]);
+  if(abs(joints->effort[3])>J4_THRESHOLD){
+    ROS_ERROR("Torque on jaco_joint_4 outside threshold (+/-%f Nm) with value %f", J4_THRESHOLD, joints->effort[3]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[4])>SMALL_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_5 outside threshold (+/-%f Nm) with value %f", SMALL_ACTUATOR_THRESHOLD, joints->effort[4]);
+  if(abs(joints->effort[4])>J5_THRESHOLD){
+    ROS_ERROR("Torque on jaco_joint_5 outside threshold (+/-%f Nm) with value %f", J5_THRESHOLD, joints->effort[4]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[5])>SMALL_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", SMALL_ACTUATOR_THRESHOLD, joints->effort[5]);
+  if(abs(joints->effort[5])>J6_THRESHOLD){
+    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", J6_THRESHOLD, joints->effort[5]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[6])>FINGER_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", FINGER_ACTUATOR_THRESHOLD, joints->effort[6]);
+  if(abs(joints->effort[6])>F1_THRESHOLD){
+    ROS_ERROR("Torque on jaco_finger_joint_1 outside threshold (+/-%f Nm) with value %f", F1_THRESHOLD, joints->effort[6]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[7])>FINGER_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", FINGER_ACTUATOR_THRESHOLD, joints->effort[7]);
+  if(abs(joints->effort[7])>F2_THRESHOLD){
+    ROS_ERROR("Torque on jaco_finger_joint_2 outside threshold (+/-%f Nm) with value %f", F2_THRESHOLD, joints->effort[7]);
     shouldSpeak = true;
   }
-  if(abs(joints->effort[8])>FINGER_ACTUATOR_THRESHOLD){
-    ROS_ERROR("Torque on jaco_joint_6 outside threshold (+/-%f Nm) with value %f", FINGER_ACTUATOR_THRESHOLD, joints->effort[8]);
+  if(abs(joints->effort[8])>F3_THRESHOLD){
+    ROS_ERROR("Torque on jaco_finger_joint_3 outside threshold (+/-%f Nm) with value %f", F3_THRESHOLD, joints->effort[8]);
     shouldSpeak = true;
   }
 

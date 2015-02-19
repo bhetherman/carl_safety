@@ -6,13 +6,9 @@
 
 <launch>
   <arg name="use_teleop_safety" default="false" />
-  <arg name="enable_audible_warnings" default="false" />
 
   <node pkg="carl_safety" type="nav_safety" name="nav_safety" output="screen">
     <param name="use_teleop_safety" type="bool" value="$(arg use_teleop_safety)" />
-  </node>
-  <node pkg="carl_safety" type="arm_safety" name="arm_safety" output="screen">
-    <param name="enable_audible_warnings" type="bool" value="$(arg enable_audible_warnings)" />
   </node>
   <node pkg="carl_safety" type="teleop_safety" name="teleop_safety" output="screen" />
 </launch>

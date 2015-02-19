@@ -17,29 +17,15 @@
 #include <stdio.h>
 #include <sensor_msgs/JointState.h>
 
-
-/*!
- * \def START_FORWARD_SAFETY_THROTTLE_DIST
- *
- * The dist to start throttling forward linear vel for safety.
- */
-#define LARGE_ACTUATOR_THRESHOLD  26.0
-
-/*!
- * \def MIN_SAFE_DIST
- *
- * The dist to start throttling forward linear vel for safety.
- */
-#define SMALL_ACTUATOR_THRESHOLD  7.0
-
-/*!
- * \def START_SAFETY_THROTTLE_DIST
- *
- * The dist to start throttling linear vel for safety.
- */
-#define FINGER_ACTUATOR_THRESHOLD 1.5
-
-
+#define J1_THRESHOLD  7.0
+#define J2_THRESHOLD  25.5
+#define J3_THRESHOLD 14.0
+#define J4_THRESHOLD  5.0
+#define J5_THRESHOLD  5.0
+#define J6_THRESHOLD 3.5
+#define F1_THRESHOLD  1.5
+#define F2_THRESHOLD  1.5
+#define F3_THRESHOLD 1.5
 
 /*!
  * \class arm_safety
