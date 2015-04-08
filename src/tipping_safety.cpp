@@ -45,7 +45,7 @@ void TippingSafety::jointStateCallback(const sensor_msgs::JointState::ConstPtr& 
     }
     if (enableAudibleWarnings)
     {
-      system("mpg123 /etc/carl/mario.mp3");
+      system("mpg123 /etc/carl/mario.mp3 >/dev/null 2>&1");
     }
   }
 }
