@@ -2,6 +2,11 @@
 Changelog for package carl_safety
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.5 (2015-04-08)
+------------------
+* carl safety now pipes output to dev null
+* Contributors: Russell Toris
+
 0.0.4 (2015-02-17)
 ------------------
 * Adjusted finger current thresholds
