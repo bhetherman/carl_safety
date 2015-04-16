@@ -4,7 +4,31 @@ project(carl_safety)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp actionlib geometry_msgs move_base_msgs nav_msgs sensor_msgs std_msgs std_srvs tf wpi_jaco_msgs)
+find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  actionlib
+  geometry_msgs
+  message_generation
+  move_base_msgs
+  nav_msgs
+  sensor_msgs
+  std_msgs
+  std_srvs
+  tf
+  wpi_jaco_msgs
+)
+
+################################################
+## Declare ROS messages, services and actions ##
+################################################
+
+## Generate messages in the 'msg' folder
+add_message_files(FILES
+  Error.msg
+)
+
+generate_messages(DEPENDENCIES
+)
 
 ###################################################
 ## Declare things to be passed to other projects ##
@@ -36,8 +60,8 @@ target_link_libraries(teleop_safety ${catkin_LIBRARIES})
 target_link_libraries(arm_safety ${catkin_LIBRARIES})
 target_link_libraries(tipping_safety ${catkin_LIBRARIES})
 
-add_dependencies(nav_safety wpi_jaco_msgs_gencpp)
-add_dependencies(tipping_safety wpi_jaco_msgs_gencpp)
+add_dependencies(nav_safety ${PROJECT_NAME}_generate_messages_cpp wpi_jaco_msgs_gencpp)
+add_dependencies(tipping_safety ${PROJECT_NAME}_generate_messages_cpp wpi_jaco_msgs_gencpp)
 
 #############
 ## Install ##

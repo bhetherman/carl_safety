@@ -7,6 +7,7 @@ TippingSafety::TippingSafety()
   private_nh.param<bool>("enable_audible_warnings", enableAudibleWarnings, false);
 
   jointStateSubscriber = node.subscribe("frame_joint_states", 1, &TippingSafety::jointStateCallback, this);
+  safetyErrorPublisher = node.advertise<carl_safety::Error>("carl_safety/error", 1);
 
   // ROS services
   jacoEStopClient = node.serviceClient<wpi_jaco_msgs::EStop>("jaco_arm/software_estop");
@@ -43,6 +44,14 @@ void TippingSafety::jointStateCallback(const sensor_msgs::JointState::ConstPtr& 
     {
       ROS_INFO("Could not call safe nav stop service.");
     }
+
+    //feedback
+    carl_safety::Error error;
+    error.message = "Tipping detected.  Please wait until the robot is re-enabled.";
+    error.severity = 2;
+    error.resolved = false;
+    safetyErrorPublisher.publish(error);
+
     if (enableAudibleWarnings)
     {
       system("mpg123 /etc/carl/mario.mp3 >/dev/null 2>&1");

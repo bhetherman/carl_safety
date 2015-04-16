@@ -22,6 +22,7 @@ NavSafety::NavSafety() :
     baseCommandPublisher = node.advertise<geometry_msgs::Twist>("cmd_vel_safety_check", 1);
   else
     baseCommandPublisher = node.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+  safetyErrorPublisher = node.advertise<carl_safety::Error>("carl_safety/error", 1);
 
   safeBaseCommandSubscriber = node.subscribe("cmd_vel_safe", 1, &NavSafety::safeBaseCommandCallback, this);
   joySubscriber = node.subscribe("joy", 1, &NavSafety::joyCallback, this);
@@ -54,21 +55,41 @@ void NavSafety::joyCallback(const sensor_msgs::Joy::ConstPtr& joy)
   {
     if (joy->buttons.at(8) == 1)
     {
-      stopped = true;
+      if (!stopped)
+      {
+        stopped = true;
+        publishStoppedError();
+      }
       cancelNavGoals();
     }
     else if (joy->buttons.at(9) == 1)
-      stopped = false;
+    {
+      if (stopped)
+      {
+        stopped = false;
+        publishClearError();
+      }
+    }
   }
   else
   {
     if (joy->buttons.at(6) == 1)
     {
-      stopped = true;
+      if (!stopped)
+      {
+        stopped = true;
+        publishStoppedError();
+      }
       cancelNavGoals();
     }
     else if (joy->buttons.at(7) == 1)
-      stopped = false;
+    {
+      if (stopped)
+      {
+        stopped = false;
+        publishClearError();
+      }
+    }
   }
 }
 
@@ -79,6 +100,7 @@ void NavSafety::safeBaseCommandCallback(const geometry_msgs::Twist::ConstPtr& ms
     if (!isArmContained())
     {
       //ignore movement command if arm is in a dangerous position
+      publishArmNotContainedError();
       return;
     }
     if (x < BOUNDARY_X && y > BOUNDARY_Y)
@@ -159,6 +181,7 @@ void NavSafety::safeMoveCallback(const move_base_msgs::MoveBaseGoalConstPtr &goa
     {
       move_base_msgs::MoveBaseResult moveResult;
       asSafeMove.setAborted(moveResult, "Navigation aborted because the arm is not contained within the robot's navigation footprint.");
+      publishArmNotContainedError();
     }
   }
   else
@@ -211,6 +234,33 @@ bool NavSafety::isArmContained()
   return (srv.response.pos.linear.x <= .215 && srv.response.pos.linear.x >= -.435
             && fabs(srv.response.pos.linear.y) <= .28
             && srv.response.pos.linear.z >= .19);
+}
+
+void NavSafety::publishArmNotContainedError()
+{
+  carl_safety::Error error;
+  error.message = "Base movement canceled because the arm is not contained.  Please ready or retract the arm before moving.";
+  error.severity = 0;
+  error.resolved = false;
+  safetyErrorPublisher.publish(error);
+}
+
+void NavSafety::publishStoppedError()
+{
+  carl_safety::Error error;
+  error.message = "Robot control disabled for safety.  Please wait until the robot is re-enabled.";
+  error.severity = 2;
+  error.resolved = false;
+  safetyErrorPublisher.publish(error);
+}
+
+void NavSafety::publishClearError()
+{
+  carl_safety::Error error;
+  error.message = "Robot re-enabled.";
+  error.severity = 2;
+  error.resolved = true;
+  safetyErrorPublisher.publish(error);
 }
 
 int main(int argc, char **argv)
