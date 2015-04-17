@@ -2,6 +2,12 @@
 Changelog for package carl_safety
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.0.6 (2015-04-17)
+------------------
+* Added error feedback messages
+* travis fix
+* Contributors: David Kent, Russell Toris
+
 0.0.5 (2015-04-08)
 ------------------
 * carl safety now pipes output to dev null
