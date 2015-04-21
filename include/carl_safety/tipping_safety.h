@@ -13,6 +13,7 @@
 #define TIPPING_SAFETY_H_
 
 #include <ros/ros.h>
+#include <carl_safety/Error.h>
 #include <sensor_msgs/JointState.h>
 #include <std_srvs/Empty.h>
 #include <wpi_jaco_msgs/EStop.h>
@@ -38,6 +39,7 @@ private:
 
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
+  ros::Publisher safetyErrorPublisher;
   ros::Subscriber jointStateSubscriber; /*!< subscriber for robot frame joint states */
 
   ros::ServiceClient jacoEStopClient;

@@ -16,6 +16,7 @@
 #include <ros/ros.h>
 #include <actionlib/client/simple_action_client.h>
 #include <actionlib/server/simple_action_server.h>
+#include <carl_safety/Error.h>
 #include <geometry_msgs/Pose.h>
 #include <geometry_msgs/Twist.h>
 #include <move_base_msgs/MoveBaseAction.h>
@@ -97,9 +98,16 @@ private:
 
   bool isArmContained();
 
+  void publishArmNotContainedError();
+
+  void publishStoppedError();
+
+  void publishClearError();
+
   ros::NodeHandle node; /*!< a handle for this ROS node */
 
   ros::Publisher baseCommandPublisher; /*!< actual base command publisher */
+  ros::Publisher safetyErrorPublisher; /*!< safety error message publisher */
   ros::Subscriber safeBaseCommandSubscriber; /*!< subscriber for base commands coming from the web */
   ros::Subscriber joySubscriber; /*!< subscriber for joystick input */
   ros::Subscriber robotPoseSubscriber; /*!< subscriber for the robot base pose */
